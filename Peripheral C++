@@ -1,0 +1,39 @@
+#include <Wire.h>
+
+const int ledPin = 9;
+const int slaveAddress = 8;
+
+volatile int potValue = 0;
+volatile bool dataReceived = false;
+
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  
+  Wire.begin(slaveAddress);    
+  Wire.onReceive(receiveEvent); 
+  
+  Serial.begin(9600);
+  Serial.println("Peripheral Initialized");
+}
+
+void loop() {
+  if (dataReceived) {
+    int brightness = map(potValue, 0, 1023, 0, 255);
+    analogWrite(ledPin, brightness);
+    
+    Serial.print("PWM: ");
+    Serial.println(brightness);
+    
+    dataReceived = false;
+  }
+}
+
+void receiveEvent(int howMany) {
+  if (howMany >= 2) {
+    byte high = Wire.read();
+    byte low = Wire.read();
+    
+    potValue = word(high, low);
+    dataReceived = true;
+  }
+}
