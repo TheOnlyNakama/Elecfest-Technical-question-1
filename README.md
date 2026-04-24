@@ -1,1 +1,0 @@
-# Elecfest-Technical-question-1
